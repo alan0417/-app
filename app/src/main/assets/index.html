@@ -772,7 +772,7 @@
 
   const fab = document.getElementById('fab');
   const vo = document.getElementById('voiceOverlay'), voText = document.getElementById('voiceText');
-  let holdTimer = null, voiceOn = false, suppressClick = false, webRec = null;
+  let holdTimer = null, voiceOn = false, suppressClick = false, webRec = null, lastPartial = '';
   function voiceUI(state, txt){
     if (state === 'hide'){ vo.classList.add('hidden'); document.body.classList.remove('listening'); fab.classList.remove('jelly'); return; }
     vo.classList.remove('hidden'); vo.dataset.state = state; document.body.classList.add('listening');
@@ -781,15 +781,22 @@
     voText.textContent = txt || '請說「金額 項目 備註」\n例如：120 餐飲 午餐便當';
   }
   function voiceResult(text){
+    // 有些手機放開後的「最終結果」是空的，就用最後看到的即時文字
+    text = (text || '').trim() || lastPartial.trim();
+    lastPartial = '';
     voiceUI('hide');
     if (!text){ toast('沒有聽到內容，請再試一次'); return; }
     openSheet(parseVoice(text));
   }
   // App 外殼（Android）呼叫這個函式回報辨識狀態
   window.onVoiceEvent = function(type, text){
-    if (type === 'partial') voiceUI(voiceOn ? 'listening' : 'working', text);
+    if (type === 'partial'){ if (text) lastPartial = text; voiceUI(voiceOn ? 'listening' : 'working', text); }
     else if (type === 'result') voiceResult(text);
-    else if (type === 'error'){ voiceUI('hide'); voiceOn = false; toast(text || '語音辨識失敗'); }
+    else if (type === 'error'){
+      voiceOn = false;
+      if (lastPartial.trim()) voiceResult('');          // 已經聽到字了，就用聽到的字，不當成失敗
+      else { voiceUI('hide'); toast(text || '語音辨識失敗'); }
+    }
   };
   function typeFallback(){
     voiceOn = false; voiceUI('hide');
@@ -806,7 +813,7 @@
   document.getElementById('vtCancel').onclick = () => document.getElementById('voiceType').classList.add('hidden');
   function startVoice(){
     if (!shown(curCycle()).length){ toast('請先到設定填金額'); return; }
-    voiceOn = true; suppressClick = true;
+    voiceOn = true; suppressClick = true; lastPartial = '';
     try{ navigator.vibrate && navigator.vibrate(30); }catch(_){}
     voiceUI('listening');
     if (window.AndroidVoice){ window.AndroidVoice.start(); return; }

@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     private static final String START_URL = "https://appassets.androidplatform.net/assets/index.html";
     private WebView webView;
     private SpeechRecognizer recognizer;
+    private String lastPartial = "";   // 按住時最後辨識到的文字（放開後的最終結果有時是空的）
     private static final int REQ_MIC = 42;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -144,14 +145,23 @@ public class MainActivity extends Activity {
 
                 @Override public void onPartialResults(Bundle partial) {
                     String t = first(partial);
-                    if (t != null && !t.isEmpty()) sendToPage("partial", t);
+                    if (t != null && !t.isEmpty()) { lastPartial = t; sendToPage("partial", t); }
                 }
 
                 @Override public void onResults(Bundle results) {
-                    sendToPage("result", first(results));
+                    String t = first(results);
+                    if (t == null || t.trim().isEmpty()) t = lastPartial;
+                    lastPartial = "";
+                    sendToPage("result", t);
                 }
 
                 @Override public void onError(int error) {
+                    // 已經聽到字了（例如放開後回報「沒有對到」），直接用聽到的字
+                    if (!lastPartial.trim().isEmpty() && error != SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
+                        String t = lastPartial; lastPartial = "";
+                        sendToPage("result", t);
+                        return;
+                    }
                     String msg;
                     switch (error) {
                         case SpeechRecognizer.ERROR_NO_MATCH:
@@ -171,6 +181,7 @@ public class MainActivity extends Activity {
                 }
             });
         }
+        lastPartial = "";
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-TW");
