@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 語音記帳需要麥克風；第一次長按＋時才會詢問使用者 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Android 11 以上要宣告才找得到手機的語音辨識服務 -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

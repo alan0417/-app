@@ -235,6 +235,41 @@
   .itip.up::before{content:"";position:absolute;left:28px;top:-7px;border:8px solid transparent;border-top:0;border-bottom-color:#3d7bf5}
   .itip.down{margin:4px auto 12px}
   .itip.down::after{content:"";position:absolute;left:50%;margin-left:-8px;bottom:-7px;border:8px solid transparent;border-bottom:0;border-top-color:#1a52dc}
+
+  /* 語音記帳 */
+  #fab{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .voice{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(40,48,60,.28);pointer-events:none}
+  .voice.hidden{display:none}
+  .voice-card{background:var(--card);border-radius:24px;padding:26px 22px 22px;width:min(300px,82vw);text-align:center;box-shadow:0 14px 34px rgba(20,40,90,.25)}
+  .mic{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;background:var(--orange-fill);color:#fff;display:flex;align-items:center;justify-content:center}
+  .voice[data-state=listening] .mic{animation:micPulse 1.2s ease-in-out infinite}
+  @keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(31,95,230,.45)}70%{box-shadow:0 0 0 18px rgba(31,95,230,0)}100%{box-shadow:0 0 0 0 rgba(31,95,230,0)}}
+  .vt{font-weight:700;font-size:16px;margin-bottom:8px}
+  .vtext{white-space:pre-line;color:var(--muted);font-size:14px;line-height:1.6;min-height:44px}
+  .vhint{background:var(--bg);box-shadow:var(--press);border-radius:12px;padding:9px 12px;font-size:13px;color:var(--muted);line-height:1.5;margin:-4px 0 14px}
+  .vhint b{color:var(--warn);font-weight:600}
+
+  /* 語音時：其他畫面變暗、＋按鈕浮在最上層並有果凍感 */
+  .voice{background:rgba(12,18,30,.62)!important;transition:background .2s}
+  body.listening #fab{z-index:45}
+  body.listening .tips{display:none}
+  #fab{transition:transform .15s ease-out}
+  #fab.squish{transform:translateX(-50%) scale(.9)}
+  #fab.jelly{animation:jelly .9s ease-in-out infinite}
+  #fab.bounce{animation:jellyOut .55s ease-out}
+  @keyframes jelly{
+    0%,100%{transform:translateX(-50%) scale(1,1)}
+    25%{transform:translateX(-50%) scale(1.1,.9)}
+    50%{transform:translateX(-50%) scale(.93,1.07)}
+    75%{transform:translateX(-50%) scale(1.05,.95)}
+  }
+  @keyframes jellyOut{
+    0%{transform:translateX(-50%) scale(.9)}
+    35%{transform:translateX(-50%) scale(1.12,.88)}
+    55%{transform:translateX(-50%) scale(.94,1.06)}
+    75%{transform:translateX(-50%) scale(1.03,.97)}
+    100%{transform:translateX(-50%) scale(1,1)}
+  }
 </style>
 </head>
 <body>
@@ -258,6 +293,7 @@
 <div class="mask hidden" id="mask">
   <form class="sheet" id="sheet" autocomplete="off">
     <h2>記一筆支出</h2>
+    <div class="vhint" id="fVoice" hidden></div>
     <div class="field"><label>金額</label><input class="amount-in" id="fAmt" type="text" inputmode="decimal" enterkeyhint="done" placeholder="0"></div>
     <div class="field"><label>扣在哪筆預期支出</label><div class="chips" id="fChips"></div></div>
     <div class="field"><label>日期</label><input id="fDate" type="date"></div>
@@ -266,6 +302,13 @@
   </form>
 </div>
 <div class="tips"><button id="newCycleTip" class="tip hidden" type="button">尚未填寫本期收入！<br>點這裡填寫</button><button id="budgetTip" class="tip hidden" type="button">尚未填寫預期支出！<br>點這裡填寫</button></div>
+<div class="voice hidden" id="voiceOverlay"><div class="voice-card"><div class="mic"><svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg></div><div class="vt" id="voiceTitle">聆聽中…</div><div class="vtext" id="voiceText"></div></div></div>
+<div class="mask hidden" id="voiceType"><form class="sheet" id="vtForm" autocomplete="off">
+    <h2>模擬語音輸入</h2>
+    <div class="vhint">預覽版無法使用麥克風，請把要說的話打出來。格式：「金額 項目 備註」，例如「120 餐飲 午餐便當」或「兩千五 房租」。裝成 App 後就是真的用說的。</div>
+    <div class="field"><input id="vtIn" type="text" placeholder="120 餐飲 午餐便當"></div>
+    <div class="row"><button type="button" class="btn ghost" id="vtCancel">取消</button><button type="submit" class="btn primary">辨識</button></div>
+  </form></div>
 <div id="toast"></div>
 
 <script>
@@ -651,10 +694,12 @@
   // ---------- 記一筆 ----------
   const mask = document.getElementById('mask');
   let pick = null;
-  function openSheet(){
+  function openSheet(pre){
+    pre = (pre && pre.type !== 'click') ? pre : null;
     const c = curCycle();
     const choices = shown(c);
     if (!choices.length){ toast('請先到設定填金額'); return; }
+    if (pre && pre.budgetId && choices.some(b => b.id === pre.budgetId)) pick = pre.budgetId;
     if (!pick || !choices.some(b => b.id === pick)) pick = choices[0].id;
     document.getElementById('fChips').innerHTML = choices.map(b => {
       const r = b.amount - spentOf(c, b.id);
@@ -662,11 +707,138 @@
     }).join('');
     const d = document.getElementById('fDate');
     d.min = c.start; d.max = addDays(c.end, -1); d.value = today();
-    document.getElementById('fAmt').value = ''; document.getElementById('fNote').value = '';
+    document.getElementById('fAmt').value = pre && pre.amount ? pre.amount : '';
+    document.getElementById('fNote').value = pre && pre.note ? pre.note : '';
+    const vh = document.getElementById('fVoice');
+    if (pre){ vh.hidden = false; vh.innerHTML = '語音：「'+esc(pre.text)+'」' + (pre.amount && pre.budgetId ? '<br>請確認內容後按儲存' : '<br><b>'+(!pre.amount?'沒聽出金額':'沒認出項目')+'，請手動補上</b>'); }
+    else { vh.hidden = false; vh.innerHTML = '小技巧：長按＋可以用語音記帳，說「金額 項目 備註」'; }
     mask.classList.remove('hidden');
-    setTimeout(() => document.getElementById('fAmt').focus(), 50);
+    if (!pre) setTimeout(() => document.getElementById('fAmt').focus(), 50);
   }
-  document.getElementById('fab').onclick = openSheet;
+
+  // ---------- 語音記帳：長按＋開始聽，放開結束 ----------
+  // 說法：「金額 項目 備註」，例如「120 餐飲 午餐便當」
+  const CN = {'零':0,'〇':0,'一':1,'二':2,'兩':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9};
+  function cnToNum(t){                      // 支援「一百二十」「兩千五」「一萬三千五」「三百五」
+    let total = 0, section = 0, num = 0, lastUnit = 0;
+    for (const ch of t){
+      if (ch in CN){ num = CN[ch]; if (ch === '零' || ch === '〇') lastUnit = 0; }   // 有「零」就照字面算，例如一百零五
+      else if (ch === '十' || ch === '百' || ch === '千'){
+        const u = ch === '十' ? 10 : ch === '百' ? 100 : 1000;
+        section += (num || (ch === '十' ? 1 : 0)) * u; num = 0; lastUnit = u;
+      } else if (ch === '萬'){
+        total += (section + num) * 10000; section = 0; num = 0; lastUnit = 10000;
+      }
+    }
+    if (num && lastUnit >= 100) num = num * lastUnit / 10;   // 口語省略：「一百二」= 120
+    return total + section + num;
+  }
+  const KEYWORDS = {
+    '餐飲':['吃','餐','飯','麵','便當','飲料','咖啡','早餐','午餐','晚餐','宵夜','點心','零食','外送'],
+    '交通':['捷運','公車','加油','油錢','停車','高鐵','火車','計程車','車資','悠遊卡'],
+    '娛樂':['電影','遊戲','唱歌','KTV','旅遊','門票','串流'],
+    '寵物用品':['寵物','貓','狗','飼料','貓砂','罐頭'],
+    '機車':['機車','保養','維修','輪胎'],
+    '房租':['房租','租金'],
+    '貸款':['貸款','還款'],
+    '儲蓄':['儲蓄','存錢','存款'],
+    '投資':['投資','股票','基金','定期定額'],
+    '生活用品':['日用','衛生紙','洗衣','全聯','家樂福','超市']
+  };
+  function parseVoice(text){
+    const c = curCycle(), choices = shown(c);
+    let t = text.replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).trim();
+    let amount = 0;
+    const m = t.match(/(\d[\d,]*(?:\.\d+)?)\s*萬?|[零〇一二兩三四五六七八九十百千萬]+/);
+    if (m){
+      if (m[1]) amount = parseFloat(m[1].replace(/,/g,'')) * (m[0].includes('萬') ? 10000 : 1);
+      else amount = cnToNum(m[0]);
+      t = (t.slice(0, m.index) + ' ' + t.slice(m.index + m[0].length));
+    }
+    t = t.replace(/^\s*(元|塊錢|塊|塊錢的)/, ' ').replace(/(新台幣|台幣|NT\$?|\$)/gi, ' ');
+    // 項目：先找名稱（越長越優先），找不到再用常見詞對照
+    let budget = null, hit = '';
+    choices.slice().sort((a,b) => b.name.length - a.name.length).forEach(b => { if (!budget && t.includes(b.name)){ budget = b; hit = b.name; } });
+    if (!budget){
+      for (const b of choices){
+        const kws = KEYWORDS[b.name] || [];
+        const k = kws.find(k => t.toLowerCase().includes(k.toLowerCase()));
+        if (k){ budget = b; break; }
+      }
+    }
+    let note = (hit ? t.replace(hit, ' ') : t).replace(/[，。,\.、]/g, ' ').replace(/\s+/g, ' ').trim();
+    return { text, amount: amount ? Math.round(amount*100)/100 : 0, budgetId: budget ? budget.id : null, note };
+  }
+
+  const fab = document.getElementById('fab');
+  const vo = document.getElementById('voiceOverlay'), voText = document.getElementById('voiceText');
+  let holdTimer = null, voiceOn = false, suppressClick = false, webRec = null;
+  function voiceUI(state, txt){
+    if (state === 'hide'){ vo.classList.add('hidden'); document.body.classList.remove('listening'); fab.classList.remove('jelly'); return; }
+    vo.classList.remove('hidden'); vo.dataset.state = state; document.body.classList.add('listening');
+    fab.classList.toggle('jelly', state === 'listening');
+    document.getElementById('voiceTitle').textContent = state === 'listening' ? '聆聽中…放開結束' : '辨識中…';
+    voText.textContent = txt || '請說「金額 項目 備註」\n例如：120 餐飲 午餐便當';
+  }
+  function voiceResult(text){
+    voiceUI('hide');
+    if (!text){ toast('沒有聽到內容，請再試一次'); return; }
+    openSheet(parseVoice(text));
+  }
+  // App 外殼（Android）呼叫這個函式回報辨識狀態
+  window.onVoiceEvent = function(type, text){
+    if (type === 'partial') voiceUI(voiceOn ? 'listening' : 'working', text);
+    else if (type === 'result') voiceResult(text);
+    else if (type === 'error'){ voiceUI('hide'); voiceOn = false; toast(text || '語音辨識失敗'); }
+  };
+  function typeFallback(){
+    voiceOn = false; voiceUI('hide');
+    const box = document.getElementById('voiceType');
+    box.classList.remove('hidden');
+    const inp = document.getElementById('vtIn'); inp.value = ''; setTimeout(() => inp.focus(), 50);
+  }
+  document.getElementById('vtForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = document.getElementById('vtIn').value.trim();
+    document.getElementById('voiceType').classList.add('hidden');
+    if (v) openSheet(parseVoice(v));
+  });
+  document.getElementById('vtCancel').onclick = () => document.getElementById('voiceType').classList.add('hidden');
+  function startVoice(){
+    if (!shown(curCycle()).length){ toast('請先到設定填金額'); return; }
+    voiceOn = true; suppressClick = true;
+    try{ navigator.vibrate && navigator.vibrate(30); }catch(_){}
+    voiceUI('listening');
+    if (window.AndroidVoice){ window.AndroidVoice.start(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR){ typeFallback(); return; }
+    try{
+      webRec = new SR(); webRec.lang = 'zh-TW'; webRec.interimResults = true;
+      let finalText = '';
+      webRec.onresult = e => { let t=''; for (const r of e.results) t += r[0].transcript; if (e.results[e.results.length-1].isFinal) finalText = t; voText.textContent = t; };
+      webRec.onerror = () => typeFallback();
+      webRec.onend = () => { if (vo.classList.contains('hidden')) return; const t = finalText || (voText.textContent.includes('例如') ? '' : voText.textContent); if (t) voiceResult(t); else typeFallback(); };
+      webRec.start();
+    }catch(_){ typeFallback(); }
+  }
+  function stopVoice(){
+    if (!voiceOn) return;
+    voiceOn = false; voiceUI('working', voText.textContent);
+    if (window.AndroidVoice) window.AndroidVoice.stop();
+    else if (webRec) try{ webRec.stop(); }catch(_){}
+  }
+  fab.addEventListener('pointerdown', () => { suppressClick = false; fab.classList.remove('bounce'); fab.classList.add('squish'); clearTimeout(holdTimer); holdTimer = setTimeout(() => { fab.classList.remove('squish'); startVoice(); }, 450); });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev => fab.addEventListener(ev, () => {
+    clearTimeout(holdTimer);
+    if (fab.classList.contains('squish') || fab.classList.contains('jelly')){
+      fab.classList.remove('squish','jelly'); void fab.offsetWidth; fab.classList.add('bounce');
+    }
+    stopVoice();
+  }));
+  fab.addEventListener('animationend', e => { if (e.animationName === 'jellyOut') fab.classList.remove('bounce'); });
+  fab.addEventListener('contextmenu', e => e.preventDefault());
+  fab.addEventListener('click', e => { if (suppressClick){ suppressClick = false; return; } openSheet(); });
+  window.__voiceTest = t => openSheet(parseVoice(t));   // 測試用
   document.getElementById('fCancel').onclick = () => mask.classList.add('hidden');
   mask.addEventListener('click', e => { if (e.target === mask) mask.classList.add('hidden'); });
   document.getElementById('fChips').addEventListener('click', e => {
