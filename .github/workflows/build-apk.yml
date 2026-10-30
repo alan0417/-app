@@ -53,7 +53,7 @@ jobs:
           KEY_ALIAS: paydaybudget
         run: |
           set +e
-          gradle assembleRelease --no-daemon --console=plain > build.log 2>&1
+          gradle assembleRelease bundleRelease --no-daemon --console=plain > build.log 2>&1
           code=$?
           set -e
           if [ $code -ne 0 ]; then
@@ -65,12 +65,14 @@ jobs:
           fi
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk "dist/payday-budget-${VERSION_NAME}.apk"
+          # Google Play 上架用的 .aab
+          cp app/build/outputs/bundle/release/app-release.aab "dist/payday-budget-${VERSION_NAME}.aab"
           ls -la dist
 
       - uses: actions/upload-artifact@v4
         with:
-          name: payday-budget-apk
-          path: dist/*.apk
+          name: payday-budget
+          path: dist/*
 
       - name: 發布到 Releases（新版本號才會）
         if: env.DO_RELEASE == 'true'
@@ -78,8 +80,10 @@ jobs:
         with:
           tag_name: v${{ env.VERSION_NAME }}
           target_commitish: ${{ github.sha }}
-          files: dist/*.apk
+          files: |
+            dist/*.apk
+            dist/*.aab
           name: 發薪日預算 ${{ env.VERSION_NAME }}
           body: |
-            下載下面的 apk 檔，在 Android 手機上開啟安裝。
+            下載下面的 apk 檔，在 Android 手機上開啟安裝。（.aab 檔是上架 Google Play 用的，手機不能直接安裝）
             第一次安裝時，手機會詢問是否允許「安裝不明來源的應用程式」，請選允許。

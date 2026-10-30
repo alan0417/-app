@@ -85,7 +85,8 @@ public class MainActivity extends Activity {
         });
 
         setContentView(root);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        // Android 15 以上系統預設就是全螢幕延伸；只有更舊的版本才需要手動開啟
+        if (Build.VERSION.SDK_INT < 35) WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         WindowCompat.getInsetsController(getWindow(), root).setAppearanceLightStatusBars(true);
         WindowCompat.getInsetsController(getWindow(), root).setAppearanceLightNavigationBars(true);
 
