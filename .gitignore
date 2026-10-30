@@ -6,3 +6,4 @@ local.properties
 *.keystore
 dist/
 signing/
+!keystore/release.jks.enc
