@@ -1,11 +1,10 @@
 # 每次上傳程式碼，GitHub 就自動打包一次 apk。
-# 推送 v 開頭的版本標籤（例如 v1.0.0）時，會另外發布到 Releases 頁面供人下載。
+# version.txt 裡的版本號還沒發布過時，會自動發布到 Releases 頁面供人下載。
 name: Build APK
 
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
   workflow_dispatch:
 
 permissions:
@@ -29,6 +28,7 @@ jobs:
       - name: 準備簽章金鑰
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           # 金鑰以加密檔放在 keystore/release.jks.enc，只有知道密碼（GitHub Secret）才能解開
           if [ -n "$KEYSTORE_PASSWORD" ]; then
@@ -38,12 +38,13 @@ jobs:
           else
             echo "::warning::還沒設定 KEYSTORE_PASSWORD，這次用測試金鑰簽章（之後無法直接覆蓋更新）"
           fi
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-          else
-            echo "VERSION_NAME=1.0.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
-          fi
+          # 版本號寫在 version.txt；這個版本還沒發布過，打包完就自動發布到 Releases
+          VERSION_NAME=$(tr -d ' \r\n' < version.txt)
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
           echo "VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          if [ -n "$KEYSTORE_PASSWORD" ] && ! gh release view "v$VERSION_NAME" >/dev/null 2>&1; then
+            echo "DO_RELEASE=true" >> "$GITHUB_ENV"
+          fi
 
       - name: 打包 apk
         env:
@@ -71,10 +72,12 @@ jobs:
           name: payday-budget-apk
           path: dist/*.apk
 
-      - name: 發布到 Releases（只有版本標籤才會）
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: 發布到 Releases（新版本號才會）
+        if: env.DO_RELEASE == 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ env.VERSION_NAME }}
+          target_commitish: ${{ github.sha }}
           files: dist/*.apk
           name: 發薪日預算 ${{ env.VERSION_NAME }}
           body: |
