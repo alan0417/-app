@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.paydaybudget.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.paydaybudget.app'
+        minSdk 26
+        targetSdk 35
+        versionCode (System.getenv('VERSION_CODE') ?: '1').toInteger()
+        versionName System.getenv('VERSION_NAME') ?: '1.0.0'
+    }
+
+    // 正式簽章：金鑰由 GitHub 的 Secrets 提供（不放進公開程式碼）
+    signingConfigs {
+        release {
+            def ks = System.getenv('KEYSTORE_PATH')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig System.getenv('KEYSTORE_PATH') ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.core:core:1.13.1'
+}
