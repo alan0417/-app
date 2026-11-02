@@ -280,12 +280,209 @@
   .voice[data-state=working] .vt::after{content:"";display:inline-block;width:6px}
 
   .voice{background:rgba(10,14,24,.80)!important;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+
+  /* ================= 主題：清新綠（參考圖：米白底、綠色主色、扁平圓角、深色膠囊導覽列） ================= */
+  :root{
+    --bg:#f4f3e7; --card:#fbfbf5; --ink:#1e2320; --muted:#7b8075; --line:#e4e3d5; --rim:#e4e3d5;
+    --green:#55a960; --green-dark:#2f7d3c; --green-soft:#e1edd2; --cream:#efeee1; --bubble:#eef2cf;
+    --warn:#d2513f; --warn-soft:#f6e1dc;
+    --orange:#2f7d3c; --orange-fill:#55a960;          /* 舊變數名稱沿用：重點金額、填色 */
+    --raise:none; --raise-sm:none; --press:none; --knob:var(--cream);
+  }
+  html,body,header{background:var(--bg)}
+  .card,.card.income{background:var(--card);border:1px solid var(--line)!important;box-shadow:none!important;border-radius:22px}
+  h3{color:var(--muted)}
+  .grid3 div{background:var(--cream)!important;box-shadow:none!important;border-radius:16px}
+  .bar,.share{background:#e7ead9!important;box-shadow:none!important}
+  .bar>i{background:var(--green)!important}
+  .bar.over>i{background:var(--warn)!important}
+  .pct,.btag{background:var(--green-soft)!important;color:var(--green-dark);box-shadow:none!important}
+  .banner,.readonly{background:var(--bubble)!important;color:#4f5a2c;box-shadow:none!important}
+  .vhint{background:var(--cream)!important;box-shadow:none!important}
+  input,select{background:var(--cream)!important;box-shadow:none!important;border:1px solid transparent!important;border-radius:14px}
+  input:focus,select:focus{box-shadow:0 0 0 2px rgba(85,169,96,.45)!important}
+  /* 按鈕：扁平膠囊 */
+  .btn,.chip,.del,.cycle-nav button{background:var(--cream)!important;box-shadow:none!important;color:var(--ink)}
+  .btn{border-radius:999px;font-weight:700}
+  .btn.primary,#sAdd,#sAddInc{background:var(--green)!important;color:#fff!important;box-shadow:none!important;text-shadow:none}
+  .btn.primary:active,#sAdd:active,#sAddInc:active{background:#4a9655!important}
+  .btn.danger{background:var(--warn-soft)!important;color:var(--warn)}
+  .btn:active,.chip:active,.del:active,.cycle-nav button:active:not(:disabled){background:#e3e2d3!important}
+  .chip{border-radius:999px}
+  .chip.on{background:var(--ink)!important;color:#fff!important}
+  .chip.on::before{color:var(--green)}
+  .del{color:var(--muted)}
+  .del.armed,.btn.danger.armed{background:var(--warn)!important;color:#fff!important}
+  /* 頂部：今天日期改成深色膠囊（像參考圖選中的日期） */
+  .date-badge{background:var(--ink)!important;color:#fff;box-shadow:none!important;text-shadow:none!important;border-radius:16px}
+  .cycle-nav button{border-radius:50%}
+  /* 重點金額：深綠 */
+  .big,.amt,.daily .v,.grid3 b,.bremain b,.htotal .v,.pos,.alloc.res .v.pos{color:var(--green-dark)}
+  .daily .v.neg,.grid3 b.neg,.htotal .v.neg,.bremain b.neg,.neg{color:var(--warn)}
+  /* 底部導覽：深色浮動膠囊，選中的分頁是綠色膠囊 */
+  .tabs{bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-width:456px;background:var(--ink)!important;
+    border-radius:28px;padding:6px!important;gap:4px;box-shadow:0 8px 22px rgba(30,35,32,.22)!important}
+  .tabs button{color:#b9bdb2;border-radius:999px;padding:11px 0}
+  .tabs button.on{background:var(--green)!important;color:var(--ink)!important;box-shadow:none!important;font-weight:700}
+  /* 記帳按鈕：綠色圓形、深色加號 */
+  #fab{background:var(--green)!important;color:var(--ink)!important;box-shadow:0 10px 24px rgba(60,120,60,.30)!important;bottom:calc(92px + env(safe-area-inset-bottom))}
+  #fab:active{background:#4a9655!important;box-shadow:0 6px 14px rgba(60,120,60,.30)!important}
+  #fab svg{filter:none!important}
+  /* 提示泡泡：淡黃綠對話泡泡、深色字（像參考圖的 GOOD JOB 泡泡） */
+  .tip,.itip{background:var(--bubble)!important;color:var(--ink)!important;box-shadow:0 6px 16px rgba(30,35,32,.12)!important}
+  .tip.last::after{border-top-color:var(--bubble)!important}
+  .itip.up::before{border-bottom-color:var(--bubble)!important}
+  .itip.down::after{border-top-color:var(--bubble)!important}
+  .tips{bottom:calc(84px + env(safe-area-inset-bottom))}
+  /* 語音聆聽：深綠黑背景 */
+  .voice{background:rgba(26,32,28,.86)!important}
+  .sheet{background:var(--card)!important}
+  .erow+.erow,.hrow+.hrow{border-top-color:var(--line)}
+  #toast{background:var(--ink)}
+
+  /* 預期支出：兩欄小卡 */
+  .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .bgrid .card{margin:0;padding:14px 14px 10px;display:flex;flex-direction:column;min-width:0}
+  .bgrid .card.open{grid-column:1 / -1}
+  .bgrid .bname{font-size:clamp(20px,6vw,26px);font-weight:800;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bgrid .bar{margin:10px 0 8px;height:9px}
+  .bgrid .bremain{text-align:left;font-size:13px;line-height:1.45}
+  .bgrid .bremain b{font-size:14px}
+  .bgrid .bdaily{text-align:right;margin-top:10px}
+  .bgrid .bdaily .bl{font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .bgrid .bdaily .v{font-size:clamp(22px,7vw,30px);font-weight:800;line-height:1.15;color:var(--green-dark);white-space:nowrap;overflow:hidden}
+  .bgrid .bdaily .v.neg{color:var(--warn)}
+  .bgrid .btip{align-self:center;margin-top:10px;font-size:11px;color:var(--muted);background:var(--cream);border-radius:999px;padding:4px 10px;white-space:nowrap}
+  .bgrid .elist{margin-top:10px}
+
+  /* 收入卡片明細 */
+  .icard{cursor:pointer;display:flex;flex-direction:column}
+  .icard .btip{align-self:center;margin-top:10px;font-size:11px;color:var(--muted);background:var(--cream);border-radius:999px;padding:4px 10px}
+  .ilist{margin-top:12px;border-top:1px dashed var(--line);padding-top:6px}
+  .irow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;font-size:14px}
+  .irow+.irow{border-top:1px solid var(--line)}
+  .irow small{color:var(--muted);font-size:11.5px;margin-left:4px}
+  .irow.total{font-weight:800;font-size:15px}
+  .irow.total span:last-child{color:var(--green-dark)}
+  /* 預期支出明細：懸浮頁（背景模糊、內容可滑動） */
+  .detail{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:24px 16px;
+    background:rgba(30,35,32,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:dFade .2s ease-out}
+  .detail.hidden{display:none}
+  .dsheet{width:100%;max-width:440px;max-height:min(78vh,640px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    background:var(--card);border-radius:26px;padding:18px 18px 20px;box-shadow:0 18px 40px rgba(30,35,32,.25);animation:dPop .25s cubic-bezier(.2,.9,.3,1.2)}
+  .dhead{display:flex;justify-content:space-between;align-items:center}
+  .dname{font-size:26px;font-weight:800}
+  .dclose{border:0;background:var(--cream);width:36px;height:36px;border-radius:50%;font-size:16px;color:var(--ink);cursor:pointer}
+  .dsheet .bar{margin:12px 0 14px;height:10px}
+  .dsum{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .dsum div{background:var(--cream);border-radius:14px;padding:9px 11px}
+  .dsum span{display:block;font-size:11.5px;color:var(--muted)}
+  .dsum b{font-size:18px}
+  .dsheet h4{margin:16px 2px 6px;font-size:13px;color:var(--muted);font-weight:600}
+  body.detail-open{overflow:hidden}
+  body.detail-open #fab, body.detail-open .tips{visibility:hidden}
+  @keyframes dFade{from{opacity:0}to{opacity:1}}
+  @keyframes dPop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+
+  /* 總花費卡片：左大字、右 2×2 */
+  .sumlay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.75fr);gap:12px;align-items:center}
+  .sumL .big{font-size:clamp(24px,7.6vw,36px);line-height:1.15;white-space:nowrap;overflow:hidden}
+  .sumR{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .sumR div{background:var(--cream);border-radius:16px;padding:9px 10px;min-width:0}
+  .sumR .label{display:block;font-size:12px;white-space:nowrap}
+  .sumR b{display:block;font-size:clamp(13px,4vw,16px);color:var(--green-dark);white-space:nowrap;overflow:hidden}
+  .sumR b.neg{color:var(--warn)}
+
+  /* 儲蓄與投資頁：每期一張摘要卡，點開看完整內容 */
+  .hcard{cursor:pointer;display:flex;flex-direction:column}
+  .hcard .htotal{margin:0;padding:8px 0}
+  .hcard .htotal+.htotal{border-top:1px solid var(--line)!important}
+  .hcard .htotal .v{color:var(--green-dark)}
+  .hcard .htotal .v.neg{color:var(--warn)}
+  .hcard .btip{align-self:center;margin-top:8px;font-size:11px;color:var(--muted);background:var(--cream);border-radius:999px;padding:4px 10px}
+  .hsheet{max-width:460px;max-height:min(84vh,760px);background:var(--bg)!important}
+  .hsub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .hpage{margin-top:12px}
+  .hpage .card{cursor:default;pointer-events:none}
+  .hpage h3{margin-top:14px}
+  .hcard .sub{font-size:12.5px;color:var(--muted)}
+
+  /* 頂部：問候 + 日期條（參考圖） */
+  header{padding:14px 16px 6px}
+  .hello{font-size:26px;font-weight:500;letter-spacing:.2px;margin:2px 2px 10px}
+  .hello b{font-weight:800}
+  .days{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 0 6px;scroll-behavior:smooth}
+  .days::-webkit-scrollbar{display:none}
+  .day{flex:0 0 auto;width:40px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 7px;border-radius:999px}
+  .day .wk{font-size:11px;color:var(--muted);font-weight:600}
+  .day .dn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ink)}
+  .day.used .dn{background:var(--green-soft)}
+  .day.future .dn{color:#a9ad9f}
+  .day.today{background:var(--ink)}
+  .day.today .wk{color:#fff}
+  .day.today .dn{color:#fff}
+  /* 總花費卡片頂端：期別與倒數 */
+  .sumhead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+  .sumhead b{font-size:17px}
+  .sumhead span{font-size:13px;color:var(--muted)}
+  /* 首次開啟：輸入名字的完整頁面 */
+  .welcome{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:28px}
+  .welcome.hidden{display:none}
+  .wbox{width:100%;max-width:360px;text-align:center}
+  .wlogo{width:76px;height:76px;margin:0 auto 22px;border-radius:24px;background:var(--green);color:var(--ink);display:flex;align-items:center;justify-content:center}
+  .wbox h1{font-size:28px;line-height:1.3;margin:0 0 10px}
+  .wbox p{color:var(--muted);font-size:15px;margin:0 0 22px}
+  .wbox input{text-align:center;font-size:18px;padding:14px;margin-bottom:14px}
+  .wbox .btn{width:100%;padding:14px;font-size:16px}
+  .wbox .hint{margin-top:12px}
+  .cycle-nav[hidden]{display:none!important}
+
+  /* ＋按鈕：平常每 10 秒輕輕果凍跳一下（約 0.9 秒），其餘時間靜止 */
+  #fab{animation:fabIdle 10s ease-in-out 2s infinite}
+  #fab.squish{animation:none}
+  #fab.jelly{animation:jelly .9s ease-in-out infinite}
+  #fab.bounce{animation:jellyOut .55s ease-out}
+  @keyframes fabIdle{
+    0%,90%,100%{transform:translateX(-50%) scale(1,1)}
+    91.5%{transform:translateX(-50%) translateY(-6px) scale(.94,1.07)}
+    93%{transform:translateX(-50%) scale(1.09,.91)}
+    94.5%{transform:translateX(-50%) translateY(-2px) scale(.96,1.04)}
+    96%{transform:translateX(-50%) scale(1.03,.97)}
+    97.5%{transform:translateX(-50%) scale(.99,1.01)}
+  }
+  @media (prefers-reduced-motion: reduce){ #fab{animation:none} }
+
+  /* ＋按鈕：拿掉綠色光暈，只留淡淡的中性陰影 */
+  #fab{box-shadow:0 5px 12px rgba(30,35,32,.18)!important}
+  #fab:active{box-shadow:0 2px 6px rgba(30,35,32,.18)!important}
+
+  /* ＋按鈕：完全沒有光暈；尺寸縮成原本的 80%（168 → 134px） */
+  #fab::after,#fab::before{content:none!important;display:none!important}
+  #fab{width:134px!important;height:134px!important;box-shadow:0 4px 10px rgba(30,35,32,.16)!important}
+  #fab:active{box-shadow:0 2px 5px rgba(30,35,32,.16)!important}
+  #fab svg{width:80px;height:80px}
+  #app{padding-bottom:250px}
+
+  /* 日期條：可左右滑動；今天用綠框 + 白色呼吸光 */
+  .days{position:relative;touch-action:pan-x;scroll-snap-type:x proximity;padding:8px 6px 10px;margin:0 -6px;cursor:grab}
+  .day{scroll-snap-align:center}
+  .day.out .dn,.day.out .wk{opacity:.45}
+  .day.today{background:var(--card)!important;box-shadow:inset 0 0 0 2.5px var(--green);animation:todayGlow 2.6s ease-in-out infinite}
+  .day.today .wk{color:var(--green-dark)!important}
+  .day.today .dn{color:var(--ink)!important}
+  @keyframes todayGlow{
+    0%,100%{box-shadow:inset 0 0 0 2.5px var(--green), 0 0 0 0 rgba(255,255,255,0)}
+    50%{box-shadow:inset 0 0 0 2.5px var(--green), 0 0 10px 5px rgba(255,255,255,.95)}
+  }
+  @media (prefers-reduced-motion: reduce){ .day.today{animation:none} }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <div class="cycle-nav">
+    <div class="hello">嗨，<b id="uName"></b>！</div>
+    <div class="days" id="dayStrip"></div>
+    <div class="cycle-nav" hidden>
       <button id="prevC" aria-label="上一期">‹</button>
       <div class="cycle-mid"><div class="date-badge" id="cycleDate"></div><div class="cycle-title"><div class="t" id="cycleLabel"></div><div class="s" id="cycleSub"></div></div></div>
       <button id="nextC" aria-label="下一期">›</button>
@@ -319,6 +516,16 @@
     <div class="field"><input id="vtIn" type="text" placeholder="120 餐飲 午餐便當"></div>
     <div class="row"><button type="button" class="btn ghost" id="vtCancel">取消</button><button type="submit" class="btn primary">辨識</button></div>
   </form></div>
+<div class="detail hidden" id="hdetail"><div class="dsheet hsheet" id="hBody"></div></div>
+<div class="detail hidden" id="detail"><div class="dsheet" id="dBody"></div></div>
+<div class="welcome hidden" id="welcome"><form class="wbox" id="wForm" autocomplete="off">
+    <div class="wlogo"><svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M24 10v28M10 24h28" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg></div>
+    <h1>歡迎使用<br>發薪日預算</h1>
+    <p>先讓我認識你，要怎麼稱呼你呢？</p>
+    <input id="wName" type="text" maxlength="12" placeholder="輸入你的名字或暱稱">
+    <button type="submit" class="btn primary" id="wGo">開始使用</button>
+    <div class="hint">之後可以在「設定」修改</div>
+  </form></div>
 <div id="toast"></div>
 
 <script>
@@ -326,7 +533,7 @@
   "use strict";
   const KEY = 'payday-budget-v1';
   const CARRY = 'carry';
-  const COLORS = ['#5f8270','#c09a68','#7090b0','#a87e90','#8f9a66','#8a80ae','#629a98','#7c86b4','#90939a'];
+  const COLORS = ['#55a960','#e5c04a','#7fb8d6','#e88d6b','#a48fd6','#6fc3a8','#d6a86f','#9aa4a0','#c97fa8'];
 
   // ---------- 儲存 ----------
   let memCopy = null;
@@ -429,15 +636,36 @@
   // ---------- 畫面狀態 ----------
   let tab = 'budget';
   let viewIdx = S.cycles.length - 1;
-  const open = {};           // 哪些預算卡片展開
+  let incomeOpen = false;    // 收入卡片是否展開
+  let detailId = null;       // 正在看哪張預期支出卡片的明細（懸浮頁）
   let armed = null;          // 兩段式刪除用
   const curCycle = () => S.cycles[S.cycles.length-1];
   const isCurrent = () => viewIdx === S.cycles.length - 1;
   const viewCycle = () => S.cycles[viewIdx];
   function daysLeft(c){ const t = today(); const from = t < c.start ? c.start : t; return Math.max(1, diffDays(from, c.end)); }
 
+  const WK = ['日','一','二','三','四','五','六'];
   function renderHeader(){
     const c = viewCycle();
+    document.getElementById('uName').textContent = S.userName || '你';
+    // 日期條：本期每一天；今天是深色膠囊，有記帳的日子是淡綠圓圈
+    const cur = curCycle(), t = today(), used = new Set(cur.expenses.map(e => e.date));
+    // 範圍：本期開始前 14 天 ～ 下次發薪日後 2 週（至少到今天後 3 週），可左右滑動
+    S.cycles.forEach(cy => cy.expenses.forEach(e => used.add(e.date)));
+    let d = addDays(cur.start, -14), html = '';
+    const last = [addDays(cur.end, 13), addDays(t, 21)].sort().pop();
+    while (d <= last){
+      const dt = parse(d), isT = d === t, out = d < cur.start || d >= cur.end;
+      html += '<div class="day'+(isT?' today':'')+(used.has(d)&&!isT?' used':'')+(d > t?' future':'')+(out?' out':'')+'" data-day="'+d+'">'
+        + '<span class="wk">'+(dt.getDate() === 1 ? (dt.getMonth()+1)+'月' : WK[dt.getDay()])+'</span><span class="dn">'+dt.getDate()+'</span></div>';
+      d = addDays(d, 1);
+    }
+    const strip = document.getElementById('dayStrip');
+    if (strip.dataset.key !== cur.start + t + used.size){
+      strip.innerHTML = html; strip.dataset.key = cur.start + t + used.size;
+      const td = strip.querySelector('.today');
+      if (td){ strip.style.scrollBehavior = 'auto'; strip.scrollLeft = td.offsetLeft - strip.clientWidth / 2 + td.offsetWidth / 2; strip.style.scrollBehavior = ''; }
+    }
     document.getElementById('cycleDate').textContent = md(today());   // 顯示今天日期
     document.getElementById('cycleLabel').textContent = periodName(c);
     document.getElementById('cycleSub').innerHTML = isCurrent()
@@ -470,44 +698,86 @@
       const inc = incomeTotal(c), sp = sumExp(c.expenses), rem = inc - sp;
       const ratio = inc > 0 ? Math.min(1, Math.max(0, sp / inc)) : (sp > 0 ? 1 : 0);
       const over = rem < 0;
-      h += '<div class="card income">'
-        + '<div class="bhead" style="align-items:center"><div class="bname">'+periodName(c)+'收入</div>'
+      let rows = '<div class="irow"><span>上月結餘'+(c.carry !== c.carryAuto ? '<small>（已手動修改）</small>' : '<small>（自動帶入）</small>')+'</span><span class="'+((c.carry||0)<0?'neg':'')+'">'+money(c.carry||0)+'</span></div>';
+      c.incomes.forEach(x => { rows += '<div class="irow"><span>'+esc(x.name)+'</span><span>'+money(x.amount)+'</span></div>'; });
+      rows += '<div class="irow total"><span>收入合計</span><span>'+money(inc)+'</span></div>';
+      h += '<div class="card income icard'+(incomeOpen?' open':'')+'" data-inc="1">'
+        + '<div class="bhead" style="align-items:center"><div class="bname">'+periodName(c)+'可用預算</div>'
         + '<div class="amt" style="font-size:22px;font-weight:800">'+money(inc)+'</div></div>'
         + '<div class="bar'+(over?' over':'')+'"><i style="width:'+(ratio*100).toFixed(1)+'%"></i></div>'
         + (inc === 0 && cur ? '<div class="hint">尚未填寫收入，請到「設定」填寫。</div>' : '')
+        + (incomeOpen ? '<div class="ilist">'+rows+'</div>' : '')
+        + '<div class="btip">'+(incomeOpen?'點卡片收合明細':'點卡片可看明細')+'</div>'
         + '</div><h3>'+periodName(c)+'預期支出</h3>';
     }
     if (!shown(c).length) h += '<div class="card"><div class="empty">尚無項目，請到「設定」填金額。</div></div>';
+    if (shown(c).length) h += '<div class="bgrid">';
     shown(c).forEach(b => {
       const spent = spentOf(c, b.id), remain = b.amount - spent;
       const ratio = b.amount > 0 ? Math.min(1, spent / b.amount) : (spent > 0 ? 1 : 0);
       const over = remain < 0;
       const daily = remain / dl;
       const list = sortExp(c.expenses.filter(e => e.budgetId === b.id));
+      // 兩欄小卡：名稱 → 進度條 → 剩餘 → 每日可用（大字靠右）→ 底部提示；點開時整張卡片撐滿一列顯示明細
       h += '<div class="card bcard" data-card="'+b.id+'">'
-        + '<div class="bhead"><div class="bname">'+esc(b.name)+'</div>'
-        + '<div class="bremain">剩 <b'+(remain<0?' class="neg"':'')+'>'+money(remain)+'</b> / '+money(b.amount)+'</div></div>'
+        + '<div class="bname">'+esc(b.name)+'</div>'
         + '<div class="bar'+(over?' over':'')+'"><i style="width:'+(ratio*100).toFixed(1)+'%"></i></div>'
-        + '<div class="daily">'
-        + (cur ? '<span>每日可用（剩 '+dl+' 天）</span><span class="v'+(over?' neg':'')+'">'+(over?'已超支 '+money(-remain):money(daily))+'</span>'
-               : '<span>花了 '+money(spent)+'</span><span class="v'+(over?' neg':'')+'">'+(over?'超支 '+money(-remain):'結餘 '+money(remain))+'</span>')
+        + '<div class="bremain">剩 <b'+(remain<0?' class="neg"':'')+'>'+money(remain)+'</b> / '+money(b.amount)+'</div>'
+        + '<div class="bdaily">'
+        + (cur ? (over ? '<div class="bl">已超支</div><div class="v neg">'+money(-remain)+'</div>'
+                       : '<div class="bl">每日可用（剩 '+dl+' 天）</div><div class="v">'+money(daily)+'</div>')
+               : '<div class="bl">花了 '+money(spent)+'</div><div class="v'+(over?' neg':'')+'">'+(over?'超支 '+money(-remain):'結餘 '+money(remain))+'</div>')
         + '</div>';
-      if (open[b.id]){
-        h += '<div class="elist">' + (list.length ? list.map(e => expenseRow(c, e, {showBudget:false})).join('') : '<div class="empty">尚無花費</div>') + '</div>';
-      }
-      h += '</div>';
+      h += '<div class="btip">點卡片可看花費明細</div></div>';
     });
-    if (shown(c).length) h += '<div class="hint" style="text-align:center">點卡片可看花費明細</div>';
+    if (shown(c).length) h += '</div>';
     return h;
   }
 
+  // 金額太長放不下時，自動縮小字體直到完整顯示
+  function fitText(){
+    document.querySelectorAll('.sumL .big, .sumR b, .bgrid .bdaily .v').forEach(el => {
+      el.style.fontSize = '';
+      let size = parseFloat(getComputedStyle(el).fontSize), guard = 0;
+      while (el.scrollWidth > el.clientWidth + 1 && size > 11 && guard++ < 40){ size -= 1; el.style.fontSize = size + 'px'; }
+    });
+  }
+  window.addEventListener('resize', () => fitText());
+
+  function renderDetail(){
+    const box = document.getElementById('detail');
+    const c = viewCycle(), b = detailId && c.budgets.find(x => x.id === detailId);
+    if (!b){ box.classList.add('hidden'); document.body.classList.remove('detail-open'); return; }
+    const spent = spentOf(c, b.id), remain = b.amount - spent, dl = daysLeft(c), over = remain < 0;
+    const ratio = b.amount > 0 ? Math.min(1, spent / b.amount) : (spent > 0 ? 1 : 0);
+    const list = sortExp(c.expenses.filter(e => e.budgetId === b.id));
+    document.getElementById('dBody').innerHTML =
+        '<div class="dhead"><div class="dname">'+esc(b.name)+'</div><button type="button" class="dclose" id="dClose" aria-label="關閉">✕</button></div>'
+      + '<div class="bar'+(over?' over':'')+'"><i style="width:'+(ratio*100).toFixed(1)+'%"></i></div>'
+      + '<div class="dsum"><div><span>預期支出</span><b>'+money(b.amount)+'</b></div><div><span>已花</span><b>'+money(spent)+'</b></div>'
+      + '<div><span>'+(over?'已超支':'剩餘')+'</span><b class="'+(over?'neg':'pos')+'">'+money(Math.abs(remain))+'</b></div>'
+      + (isCurrent() && !over ? '<div><span>每日可用（剩 '+dl+' 天）</span><b class="pos">'+money(remain/dl)+'</b></div>' : '')
+      + '</div>'
+      + '<h4>花費明細（'+list.length+' 筆）</h4>'
+      + '<div class="dlist">' + (list.length ? list.map(e => expenseRow(c, e, {showBudget:false})).join('') : '<div class="empty">這個項目還沒有花費</div>') + '</div>';
+    box.classList.remove('hidden'); document.body.classList.add('detail-open');
+  }
+  function closeDetail(){ detailId = null; armed = null; renderDetail(); }
+
   function summaryCard(c){
     const tb = totalBudget(c), ts = sumExp(c.expenses), dl = daysLeft(c);
-    let h = '<div class="card"><div class="label">'+periodName(c)+'總花費</div><div class="big">'+money(ts)+'</div>'
-      + '<div class="label" style="margin-top:2px">已儲蓄/投資 <b class="pos" style="font-size:15px">'+money(savedOf(c))+'</b></div>'
-      + '<div class="grid3"><div><span class="label">總預期支出</span><b>'+money(tb)+'</b></div>'
-      + '<div><span class="label">總剩餘</span><b'+(tb-ts<0?' class="neg"':'')+'>'+money(tb-ts)+'</b></div>'
-      + '<div><span class="label">'+(isCurrent()?'每日可用':'支出筆數')+'</span><b>'+(isCurrent()?money((tb-ts)/dl):c.expenses.length+' 筆')+'</b></div></div>';
+    // 左：總花費、已儲蓄/投資（大字）；右：2×2 小格
+    let h = '<div class="card"><div class="sumhead"><b>'+periodName(c)+'</b><span>'
+      + (isCurrent() ? '距離下次發薪日（'+md(c.end)+'）還有 '+daysLeft(c)+' 天' : '已結束（'+range(c)+'）') + '</span></div>'
+      + '<div class="sumlay">'
+      + '<div class="sumL"><div class="label">'+periodName(c)+'總花費</div><div class="big">'+money(ts)+'</div>'
+      + '<div class="label" style="margin-top:6px">已儲蓄/投資</div><div class="big">'+money(savedOf(c))+'</div></div>'
+      + '<div class="sumR">'
+      + '<div><span class="label">總可用預算</span><b>'+money(incomeTotal(c))+'</b></div>'
+      + '<div><span class="label">總預期支出</span><b>'+money(tb)+'</b></div>'
+      + '<div><span class="label">預算剩餘</span><b'+(incomeTotal(c)-ts<0?' class="neg"':'')+'>'+money(incomeTotal(c)-ts)+'</b></div>'
+      + '<div><span class="label">'+(isCurrent()?'每日可用':'支出筆數')+'</span><b>'+(isCurrent()?money((incomeTotal(c)-ts)/dl):c.expenses.length+' 筆')+'</b></div>'
+      + '</div></div>';
     if (ts > 0){
       h += '<div class="share">';
       c.budgets.forEach((b,i) => { const s = spentOf(c,b.id); if (s>0) h += '<i style="width:'+(s/ts*100)+'%;background:'+COLORS[i%COLORS.length]+'"></i>'; });
@@ -520,20 +790,36 @@
   }
 
   function renderHistory(){
-    const past = S.cycles.slice(0, -1).reverse();
+    const past = S.cycles.map((c, i) => [c, i]).slice(0, -1).reverse();
     if (!past.length) return '<div class="card"><div class="empty">過了下次發薪日，這裡會出現上一期紀錄。</div></div>';
-    return past.map(c => {
+    return past.map(([c, idx]) => {
       const ts = sumExp(c.expenses), tb = totalBudget(c);
-      let h = '<h3>'+parse(c.start).getFullYear()+'年 '+periodName(c)+'（'+range(c)+'）</h3><div class="card">';
-      shown(c).forEach(b => {
-        const sp = spentOf(c, b.id);
-        h += '<div class="hrow"><span>'+esc(b.name)+'</span><span>'+money(sp)+' <span class="sub">/ 預期 '+money(b.amount)+'</span>'
-          + (sp > b.amount ? ' <span class="neg sub">超支</span>' : '') + '</span></div>';
-      });
-      h += '<div class="htotal"><span>總花費</span><span class="v'+(ts>tb?' neg':'')+'">'+money(ts)+' <span class="sub" style="font-weight:400">/ '+money(tb)+'</span></span></div>'
-        + '<div class="htotal hsave"><span>已儲蓄/投資</span><span class="v pos">'+money(savedOf(c))+'</span></div></div>';
-      return h;
+      return '<h3>'+parse(c.start).getFullYear()+'年 '+periodName(c)+'（'+range(c)+'）</h3>'
+        + '<div class="card hcard" data-hist="'+idx+'">'
+        + '<div class="htotal"><span>可用預算</span><span class="v">'+money(incomeTotal(c))+'</span></div>'
+        + '<div class="htotal"><span>'+periodName(c)+'總花費</span><span class="v'+(ts>tb?' neg':'')+'">'+money(ts)+' <span class="sub" style="font-weight:400">/ 預期 '+money(tb)+'</span></span></div>'
+        + '<div class="htotal"><span>已儲蓄/投資</span><span class="v pos">'+money(savedOf(c))+'</span></div>'
+        + '<div class="btip">點卡片看完整內容</div></div>';
     }).join('');
+  }
+
+  // 歷史期別：懸浮頁顯示那一期完整的「收入與預期支出」內容（唯讀）
+  let histIdx = null;
+  function renderHistDetail(){
+    const box = document.getElementById('hdetail');
+    const c = histIdx === null ? null : S.cycles[histIdx];
+    if (!c || tab !== 'history'){ histIdx = null; box.classList.add('hidden'); if (!detailId) document.body.classList.remove('detail-open'); return; }
+    const keepIdx = viewIdx, keepInc = incomeOpen;
+    viewIdx = histIdx; incomeOpen = true;          // 借用首頁的畫法：切到那一期、收入明細展開
+    let body = renderBudget();
+    viewIdx = keepIdx; incomeOpen = keepInc;
+    body = body.replace(/<div class="readonly">[^<]*<\/div>/, '').replace(/<div class="btip">[^<]*<\/div>/g, '');
+    document.getElementById('hBody').innerHTML =
+        '<div class="dhead"><div><div class="dname">'+periodName(c)+'</div><div class="hsub">'+parse(c.start).getFullYear()+'年 '+range(c)+'・已結束</div></div>'
+      + '<button type="button" class="dclose" id="hClose" aria-label="關閉">✕</button></div>'
+      + '<div class="hpage">'+body+'</div>';
+    box.classList.remove('hidden'); document.body.classList.add('detail-open');
+    fitText();
   }
 
   function allocHTML(c){
@@ -579,7 +865,8 @@
   function renderSettings(){
     const c = curCycle();
     let opts = ''; for (let d=1; d<=31; d++) opts += '<option value="'+d+'"'+(d===S.payday?' selected':'')+'>每月 '+d+' 號</option>';
-    let h = '<h3>發薪日</h3><div class="card"><select id="sPay">'+opts+'</select>'
+    let h = '<h3>你的名字</h3><div class="card"><input id="sName" type="text" maxlength="12" placeholder="名字或暱稱" value="'+esc(S.userName||'')+'"></div>'
+      + '<h3>發薪日</h3><div class="card"><select id="sPay">'+opts+'</select>'
       + '<div class="hint">沒有該日的月份以月底計。修改後，本期延到新發薪日結束。</div></div>';
     h += '<h3>'+periodName(c)+'收入</h3><div class="card">';
     h += '<div class="brow"><input class="nm" value="上月結餘" disabled>'
@@ -614,13 +901,17 @@
 
   function render(){
     rollover();
-    if (viewIdx > S.cycles.length-1) viewIdx = S.cycles.length-1;
+    viewIdx = S.cycles.length-1;
     if (tab === 'settings') viewIdx = S.cycles.length-1;
     renderHeader();
     updateTip();
     const v = document.getElementById('view');
     v.innerHTML = tab === 'budget' ? renderBudget() : tab === 'history' ? renderHistory() : renderSettings();
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+    if (tab !== 'budget') detailId = null;
+    renderDetail();
+    renderHistDetail();
+    fitText();
   }
 
   // ---------- 事件 ----------
@@ -682,7 +973,10 @@
       armed = 'reset'; render(); return;
     }
     const card = e.target.closest('[data-card]');
-    if (card){ const id = card.dataset.card; open[id] = !open[id]; armed = null; render(); }
+    const hc = e.target.closest('[data-hist]');
+    if (hc){ histIdx = Number(hc.dataset.hist); renderHistDetail(); return; }
+    if (card){ detailId = card.dataset.card; armed = null; renderDetail(); return; }
+    if (e.target.closest('[data-inc]')){ incomeOpen = !incomeOpen; render(); }
   });
 
   document.getElementById('view').addEventListener('change', e => {
@@ -693,6 +987,7 @@
       S.firstRun = false; save(); render(); toast('發薪日已改為每月 '+S.payday+' 號'); return;
     }
     if (t.dataset.nm){ const b = c.budgets.find(x => x.id === t.dataset.nm); const v = t.value.trim(); if (b && v){ b.name = v; S.firstRun=false; save(); } else render(); return; }
+    if (t.id === 'sName'){ const v = t.value.trim(); if (v){ S.userName = v; save(); renderHeader(); } else t.value = S.userName || ''; return; }
     if (t.id === 'sCarry'){ c.carry = Math.round(toNum(t.value)); t.value = c.carry || ''; save(); liveAlloc(); return; }
     if (t.dataset.inm){ const x = c.incomes.find(i => i.id === t.dataset.inm); const v = t.value.trim(); if (x && v){ x.name = v; save(); } else render(); return; }
     if (t.dataset.iam){ const x = c.incomes.find(i => i.id === t.dataset.iam); if (x){ x.amount = Math.max(0, Math.round(toNum(t.value))); t.value = x.amount || ''; save(); liveAlloc(); } return; }
@@ -700,6 +995,34 @@
   });
 
   document.getElementById('view').addEventListener('input', e => { if (e.target.dataset.iam || e.target.dataset.am || e.target.id === 'sCarry') liveAlloc(); });
+
+  document.getElementById('hdetail').addEventListener('click', e => {
+    if (e.target.id === 'hdetail' || e.target.closest('#hClose')){ histIdx = null; renderHistDetail(); }
+  });
+  document.getElementById('detail').addEventListener('click', e => {
+    if (e.target.id === 'detail' || e.target.closest('#dClose')){ closeDetail(); return; }
+    const del = e.target.closest('[data-del]');
+    if (del){
+      const id = del.dataset.del;
+      if (armed === id){ const c = curCycle(); c.expenses = c.expenses.filter(x => x.id !== id); armed = null; save(); toast('已刪除'); render(); }
+      else { armed = id; renderDetail(); }
+    }
+  });
+
+  // ---------- 首次開啟：輸入名字 ----------
+  function showWelcome(){
+    if (S.userName) return;
+    document.getElementById('welcome').classList.remove('hidden');
+    setTimeout(() => document.getElementById('wName').focus(), 200);
+  }
+  document.getElementById('wForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = document.getElementById('wName').value.trim();
+    if (!v){ toast('請輸入名字或暱稱'); return; }
+    S.userName = v; save();
+    document.getElementById('welcome').classList.add('hidden');
+    render(); toast('嗨，' + v + '！');
+  });
 
   // ---------- 記一筆 ----------
   const mask = document.getElementById('mask');
@@ -869,6 +1192,7 @@
   });
 
   render();
+  showWelcome();
 })();
 </script>
 </body>

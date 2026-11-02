@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
                 .build();
 
         webView = new WebView(this);
-        webView.setBackgroundColor(Color.parseColor("#F1F2F4"));
+        webView.setBackgroundColor(Color.parseColor("#F4F3E7"));
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);      // 讓 localStorage 可以存資料
@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
         webView.addJavascriptInterface(new VoiceBridge(), "AndroidVoice");
 
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(Color.parseColor("#F1F2F4"));
+        root.setBackgroundColor(Color.parseColor("#F4F3E7"));
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
