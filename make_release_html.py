@@ -11,5 +11,9 @@ s = s[:start] + """    h += '<h3>其他</h3><div class="card">'
 a = "const today = () => S.fakeToday || realToday();"
 assert s.count(a) == 1
 s = s.replace(a, "const today = () => realToday();")
+import os
+ver = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'version.txt')).read().strip()
+assert "'__APP_VERSION__'" in s
+s = s.replace("'__APP_VERSION__'", "'" + ver + "'")
 open(out, 'w', encoding='utf-8').write(s)
 print('ok')

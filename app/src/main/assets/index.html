@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>發薪日預算</title>
+<title>Balanci</title>
 <style>
   :root{
     --bg:#f5f2ec; --card:#fffdf9; --ink:#1f2a24; --muted:#6f776f; --line:#e4dfd5;
@@ -977,6 +977,7 @@
 (function(){
   "use strict";
   const KEY = 'payday-budget-v1';
+  const APP_VERSION = '1.7.2';   // 打包時換成實際版本號
   const CARRY = 'carry';
   const COLORS = ['#f5cf2b','#c9a51c','#fbe58a','#8f7712','#e3bc23','#fdf0bd','#a88c17','#f1d65a','#6f5c0e'];
 
@@ -1780,7 +1781,7 @@
       next.classList.toggle('show', k >= pages - 1);   // 只在最後一頁出現
     }
     function close(){
-      S.onboarded = true; save();
+      S.onboarded = true; S.onboardedVer = APP_VERSION; save();
       box.classList.add('out'); document.body.classList.remove('onb-open');
       setTimeout(() => { box.classList.add('hidden'); box.classList.remove('out'); }, 350);
     }
@@ -1791,7 +1792,7 @@
     track.addEventListener('scroll', sync, {passive:true});
     next.onclick = () => { if (idx() >= pages - 1) close(); };
     document.getElementById('obSkip').onclick = close;
-    if (!S.onboarded) openOnboarding();
+    if (S.onboardedVer !== APP_VERSION) openOnboarding();   // 每次更新到新版本都再顯示一次
   })();
 })();
 </script>
