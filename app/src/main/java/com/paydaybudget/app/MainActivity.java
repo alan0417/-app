@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
                 .build();
 
         webView = new WebView(this);
-        webView.setBackgroundColor(Color.parseColor("#F4F3E7"));
+        webView.setBackgroundColor(Color.parseColor("#060707"));
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);      // 讓 localStorage 可以存資料
@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
         webView.addJavascriptInterface(new VoiceBridge(), "AndroidVoice");
 
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(Color.parseColor("#F4F3E7"));
+        root.setBackgroundColor(Color.parseColor("#060707"));
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
@@ -87,8 +87,8 @@ public class MainActivity extends Activity {
         setContentView(root);
         // Android 15 以上系統預設就是全螢幕延伸；只有更舊的版本才需要手動開啟
         if (Build.VERSION.SDK_INT < 35) WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        WindowCompat.getInsetsController(getWindow(), root).setAppearanceLightStatusBars(true);
-        WindowCompat.getInsetsController(getWindow(), root).setAppearanceLightNavigationBars(true);
+        WindowCompat.getInsetsController(getWindow(), root).setAppearanceLightStatusBars(false);
+        WindowCompat.getInsetsController(getWindow(), root).setAppearanceLightNavigationBars(false);
 
         if (savedInstanceState != null) webView.restoreState(savedInstanceState);
         else webView.loadUrl(START_URL);

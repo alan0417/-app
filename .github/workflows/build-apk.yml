@@ -80,9 +80,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION_NAME }}
           target_commitish: ${{ github.sha }}
-          files: |
-            dist/*.apk
-            dist/*.aab
+          files: dist/*.apk
           name: 發薪日預算 ${{ env.VERSION_NAME }}
           body: |
             下載下面的 apk 檔，在 Android 手機上開啟安裝。（.aab 檔是上架 Google Play 用的，手機不能直接安裝）
