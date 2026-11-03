@@ -963,21 +963,14 @@
   </form></div>
 <div class="detail hidden" id="hdetail"><div class="dsheet hsheet" id="hBody"></div></div>
 <div class="detail hidden" id="detail"><div class="dsheet" id="dBody"></div></div>
-<div class="welcome hidden" id="welcome"><form class="wbox" id="wForm" autocomplete="off">
-    <div class="wlogo"><svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M24 10v28M10 24h28" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg></div>
-    <h1>歡迎使用<br>發薪日預算</h1>
-    <p>先讓我認識你，要怎麼稱呼你呢？</p>
-    <input id="wName" type="text" maxlength="12" placeholder="輸入你的名字或暱稱">
-    <button type="submit" class="btn primary" id="wGo">開始使用</button>
-    <div class="hint">之後可以在「設定」修改</div>
-  </form></div>
+
 <div id="toast"></div>
 
 <script>
 (function(){
   "use strict";
   const KEY = 'payday-budget-v1';
-  const APP_VERSION = '1.7.2';   // 打包時換成實際版本號
+  const APP_VERSION = '1.7.3';   // 打包時換成實際版本號
   const CARRY = 'carry';
   const COLORS = ['#f5cf2b','#c9a51c','#fbe58a','#8f7712','#e3bc23','#fdf0bd','#a88c17','#f1d65a','#6f5c0e'];
 
@@ -1577,19 +1570,7 @@
   function syncSave(){ document.getElementById('fSave').classList.toggle('ready', toNum(document.getElementById('fAmt').value) > 0); }
   document.getElementById('fAmt').addEventListener('input', syncSave);
 
-  function showWelcome(){
-    if (S.userName) return;
-    document.getElementById('welcome').classList.remove('hidden'); document.body.classList.add('welcome-open');
-    setTimeout(() => document.getElementById('wName').focus(), 200);
-  }
-  document.getElementById('wForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const v = document.getElementById('wName').value.trim();
-    if (!v){ toast('請輸入名字或暱稱'); return; }
-    S.userName = v; save();
-    document.getElementById('welcome').classList.add('hidden'); document.body.classList.remove('welcome-open');
-    render(); toast('嗨，' + v + '！');
-  });
+  function showWelcome(){}   // 已移除輸入名字頁（名字可在設定裡填）
 
   // ---------- 記一筆 ----------
   const mask = document.getElementById('mask');
