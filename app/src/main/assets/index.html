@@ -812,6 +812,57 @@
 
   /* 顆粒改用 overlay 疊加：不會把暗部洗亮 */
   .bgfx::after{mix-blend-mode:overlay!important;opacity:.32!important;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0' intercept='1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")!important}
+
+  /* 1. 中文小字再小一點 */
+  .label{font-size:12px!important}
+  .sumR .label{font-size:11px!important}
+  .hint,.empty{font-size:11px!important}
+  .bgrid .bdaily .bl{font-size:10.5px!important}
+  .bgrid .btip,.icard .btip,.hcard .btip{font-size:10px!important}
+  .legend{font-size:11px!important}
+  .sumhead span{font-size:12px!important}
+  .sub,.hcard .sub{font-size:11px!important}
+  .day .wk{font-size:10px!important}
+  .irow small{font-size:10.5px!important}
+  .erow .d{font-size:11px!important}
+  h3{font-size:13px!important}
+  .vhint{font-size:12px!important}
+  .dsum span{font-size:10.5px!important}
+  .field label{font-size:12px!important}
+  /* 3. 浮動提示：黃底黑字＋跟＋按鈕一樣的輕跳 */
+  .tip{background:#f5cf2b!important;color:#111!important;border:0!important;animation:tipIn .3s ease-out, tipHop 5s ease-in-out 2s infinite}
+  .tip.last::after{border-top-color:#f5cf2b!important}
+  @keyframes tipHop{
+    0%,84%,100%{transform:none}
+    87%{transform:translateY(-3px) scale(.97,1.035)}
+    90%{transform:scale(1.045,.955)}
+    93%{transform:translateY(-1px) scale(.98,1.02)}
+    96%{transform:scale(1.015,.985)}
+  }
+  @media (prefers-reduced-motion: reduce){ .tip{animation:none} }
+  /* 4. ＋按鈕呼吸光減半 */
+  @keyframes fabGlow{0%,100%{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}50%{filter:drop-shadow(0 0 3px rgba(255,255,255,.28))}}
+
+  /* 首頁總花費卡片：上排三個大數字、下排三小格 */
+  .sumtop{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;margin-bottom:12px}
+  .sumtop>div{min-width:0}
+  .sumtop .big{font-size:clamp(20px,6.4vw,28px);line-height:1.2;white-space:nowrap;overflow:hidden}
+  .sumbot{grid-template-columns:1fr 1fr 1fr!important;margin-bottom:12px}
+  /* 背景：亮部範圍縮小、整體更暗 */
+  .bgfx{background:
+      radial-gradient(ellipse 55% 24% at 64% 42%, rgba(150,160,154,.26), transparent 70%),
+      radial-gradient(ellipse 42% 18% at 16% 18%, rgba(130,135,128,.16), transparent 70%),
+      radial-gradient(ellipse 60% 22% at 42% 88%, rgba(95,105,100,.14), transparent 70%),
+      linear-gradient(180deg,#020202 0%,#111312 42%,#070808 72%,#000 100%)!important}
+  .sumtop .big.purple{color:#c9b8ff!important}
+
+  /* 儲蓄、投資卡片：紫色系（與首頁比例條一致） */
+  .bgrid .card.pur .bar>i,#dBody.pur .bar>i{background:var(--bc)!important}
+  .bgrid .card.pur .bremain b,.bgrid .card.pur .bdaily .v,#dBody.pur .dsum b.pos{color:#c9b8ff!important}
+  .bgrid .card.pur .bar.over>i,#dBody.pur .bar.over>i{background:var(--warn)!important}
+  .bgrid .card.pur .bremain b.neg,.bgrid .card.pur .bdaily .v.neg{color:var(--warn)!important}
+  #dBody .bar{background:rgba(255,255,255,.10)!important}
+  #dBody.pur .pct{background:rgba(185,164,255,.16)!important;color:#c9b8ff!important}
 </style>
 </head>
 <body>
@@ -921,6 +972,10 @@
   const totalBudget = c => c.budgets.reduce((a,b) => a + b.amount, 0);
   // 名稱含「儲蓄」或「投資」的預算，算作儲蓄/投資
   const isSaving = b => /儲蓄|投資/.test(b.name);
+  // 名稱含某個詞的預期支出，實際花了多少（用來分開算儲蓄、投資）
+  // 比例條顏色：儲蓄、投資用紫色系，其他用黃色系
+  const shareColor = (b, i) => b.name.includes('儲蓄') ? '#b9a4ff' : b.name.includes('投資') ? '#8b6cf0' : COLORS[i % COLORS.length];
+  const sumByWord = (c, w) => c.budgets.filter(b => b.name.includes(w)).reduce((a,b) => a + spentOf(c, b.id), 0);
   const savedOf = c => c.budgets.filter(isSaving).reduce((a,b) => a + spentOf(c, b.id), 0);
   // 有填金額、或已經有花費的項目才顯示
   const shown = c => c.budgets.filter(b => b.amount > 0 || spentOf(c, b.id) > 0);
@@ -1070,7 +1125,7 @@
       const daily = remain / dl;
       const list = sortExp(c.expenses.filter(e => e.budgetId === b.id));
       // 兩欄小卡：名稱 → 進度條 → 剩餘 → 每日可用（大字靠右）→ 底部提示；點開時整張卡片撐滿一列顯示明細
-      h += '<div class="card bcard" data-card="'+b.id+'" style="--bc:'+colorOf(c, b)+'">'
+      h += '<div class="card bcard'+(isPurple(b)?' pur':'')+'" data-card="'+b.id+'" style="--bc:'+colorOf(c, b)+'">'
         + '<div class="bname"><span class="bn">'+esc(b.name)+'</span>'+iconSVG(b.name)+'</div>'
         + '<div class="bar'+(over?' over':'')+'"><i style="width:'+(ratio*100).toFixed(1)+'%"></i></div>'
         + '<div class="bremain">剩 <b'+(remain<0?' class="neg"':'')+'>'+money(remain)+'</b> / '+money(b.amount)+'</div>'
@@ -1087,7 +1142,7 @@
 
   // 金額太長放不下時，自動縮小字體直到完整顯示
   function fitText(){
-    document.querySelectorAll('.sumL .big, .sumR b, .bgrid .bdaily .v').forEach(el => {
+    document.querySelectorAll('.sumL .big, .sumtop .big, .sumR b, .bgrid .bdaily .v').forEach(el => {
       el.style.fontSize = '';
       let size = parseFloat(getComputedStyle(el).fontSize), guard = 0;
       while (el.scrollWidth > el.clientWidth + 1 && size > 11 && guard++ < 40){ size -= 1; el.style.fontSize = size + 'px'; }
@@ -1151,7 +1206,8 @@
     return '<svg class="bicon" viewBox="0 0 48 48" aria-hidden="true">' + ICONS[k] + '</svg>';
   }
 
-  const colorOf = (c, b) => '#f5cf2b';   // 卡片統一用主色黃（比例圖仍用深淺不同的黃）
+  const isPurple = b => /儲蓄|投資/.test(b.name);
+  const colorOf = (c, b) => b.name.includes('儲蓄') ? '#b9a4ff' : b.name.includes('投資') ? '#8b6cf0' : '#f5cf2b';   // 卡片統一用主色黃（比例圖仍用深淺不同的黃）
 
   function renderDetail(){
     const box = document.getElementById('detail');
@@ -1161,6 +1217,7 @@
     const ratio = b.amount > 0 ? Math.min(1, spent / b.amount) : (spent > 0 ? 1 : 0);
     const list = sortExp(c.expenses.filter(e => e.budgetId === b.id));
     document.getElementById('dBody').style.setProperty('--bc', colorOf(c, b));
+    document.getElementById('dBody').classList.toggle('pur', isPurple(b));
     document.getElementById('dBody').innerHTML =
         '<div class="dhead"><div class="dname"><span class="bn">'+esc(b.name)+'</span>'+iconSVG(b.name)+'</div><button type="button" class="dclose" id="dClose" aria-label="關閉">✕</button></div>'
       + '<div class="bar'+(over?' over':'')+'"><i style="width:'+(ratio*100).toFixed(1)+'%"></i></div>'
@@ -1176,23 +1233,24 @@
 
   function summaryCard(c){
     const tb = totalBudget(c), ts = sumExp(c.expenses), dl = daysLeft(c);
-    // 左：總花費、已儲蓄/投資（大字）；右：2×2 小格
+    // 上排：總花費、已儲蓄、已投資（大字）；下排三格：預算剩餘、總預期支出、未分配預算
+    const inc = incomeTotal(c), left = inc - ts, unalloc = inc - tb;
     let h = '<div class="card"><div class="sumhead"><b>'+periodName(c)+'</b><span>'
       + (isCurrent() ? '距離下次發薪日（'+md(c.end)+'）還有 '+daysLeft(c)+' 天' : '已結束（'+range(c)+'）') + '</span></div>'
-      + '<div class="sumlay">'
-      + '<div class="sumL"><div class="label">'+periodName(c)+'總花費</div><div class="big">'+money(ts)+'</div>'
-      + '<div class="label" style="margin-top:6px">已儲蓄/投資</div><div class="big">'+money(savedOf(c))+'</div></div>'
-      + '<div class="sumR">'
-      + '<div><span class="label">總可用預算</span><b>'+money(incomeTotal(c))+'</b></div>'
+      + '<div class="sumtop">'
+      + '<div><div class="label">'+periodName(c)+'總花費</div><div class="big">'+money(ts)+'</div></div>'
+      + '<div><div class="label">已儲蓄</div><div class="big purple">'+money(sumByWord(c,'儲蓄'))+'</div></div>'
+      + '<div><div class="label">已投資</div><div class="big purple">'+money(sumByWord(c,'投資'))+'</div></div>'
+      + '</div><div class="sumR sumbot">'
+      + '<div><span class="label">預算剩餘</span><b'+(left<0?' class="neg"':'')+'>'+money(left)+'</b></div>'
       + '<div><span class="label">總預期支出</span><b>'+money(tb)+'</b></div>'
-      + '<div><span class="label">預算剩餘</span><b'+(incomeTotal(c)-ts<0?' class="neg"':'')+'>'+money(incomeTotal(c)-ts)+'</b></div>'
-      + '<div><span class="label">'+(isCurrent()?'每日可用':'支出筆數')+'</span><b>'+(isCurrent()?money((incomeTotal(c)-ts)/dl):c.expenses.length+' 筆')+'</b></div>'
-      + '</div></div>';
+      + '<div><span class="label">未分配預算</span><b'+(unalloc<0?' class="neg"':'')+'>'+money(unalloc)+'</b></div>'
+      + '</div>';
     if (ts > 0){
       h += '<div class="share">';
-      c.budgets.forEach((b,i) => { const s = spentOf(c,b.id); if (s>0) h += '<i style="width:'+(s/ts*100)+'%;background:'+COLORS[i%COLORS.length]+'"></i>'; });
+      c.budgets.forEach((b,i) => { const s = spentOf(c,b.id); if (s>0) h += '<i style="width:'+(s/ts*100)+'%;background:'+shareColor(b,i)+'"></i>'; });
       h += '</div><div class="legend">';
-      c.budgets.forEach((b,i) => { const s = spentOf(c,b.id); if (s>0) h += '<span style="--c:'+COLORS[i%COLORS.length]+'">'+esc(b.name)+' '+money(s)+'（'+(s/ts*100).toFixed(0)+'%）</span>'; });
+      c.budgets.forEach((b,i) => { const s = spentOf(c,b.id); if (s>0) h += '<span style="--c:'+shareColor(b,i)+'">'+esc(b.name)+' '+money(s)+'（'+(s/ts*100).toFixed(0)+'%）</span>'; });
       h += '</div>';
     }
     h += '</div>';
@@ -1206,9 +1264,10 @@
       const ts = sumExp(c.expenses), tb = totalBudget(c);
       return '<h3>'+parse(c.start).getFullYear()+'年 '+periodName(c)+'（'+range(c)+'）</h3>'
         + '<div class="card hcard" data-hist="'+idx+'">'
-        + '<div class="htotal"><span>可用預算</span><span class="v">'+money(incomeTotal(c))+'</span></div>'
+        + '<div class="htotal"><span>'+periodName(c)+'總預算</span><span class="v">'+money(incomeTotal(c))+'</span></div>'
         + '<div class="htotal"><span>'+periodName(c)+'總花費</span><span class="v'+(ts>tb?' neg':'')+'">'+money(ts)+' <span class="sub" style="font-weight:400">/ 預期 '+money(tb)+'</span></span></div>'
-        + '<div class="htotal"><span>已儲蓄/投資</span><span class="v pos">'+money(savedOf(c))+'</span></div>'
+        + '<div class="htotal"><span>已儲蓄</span><span class="v pos">'+money(sumByWord(c, '儲蓄'))+'</span></div>'
+        + '<div class="htotal"><span>已投資</span><span class="v pos">'+money(sumByWord(c, '投資'))+'</span></div>'
         + '<div class="btip">點卡片看完整內容</div></div>';
     }).join('');
   }
