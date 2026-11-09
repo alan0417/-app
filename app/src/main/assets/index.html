@@ -906,6 +906,8 @@
   #fSave.ready{background:#f5cf2b!important;color:#111!important;border-color:transparent!important;box-shadow:none!important;text-shadow:none!important}
   #fSave{transition:background .2s,color .2s}
   .sheet{background:rgba(22,24,23,.94)!important}
+  .bgrid .card.full{opacity:.45}
+  .sumtop .big.neg{color:var(--warn)!important}
 </style>
 </head>
 <body>
@@ -970,7 +972,7 @@
 (function(){
   "use strict";
   const KEY = 'payday-budget-v1';
-  const APP_VERSION = '1.7.3';   // 打包時換成實際版本號
+  const APP_VERSION = '1.7.4';   // 打包時換成實際版本號
   const CARRY = 'carry';
   const COLORS = ['#f5cf2b','#c9a51c','#fbe58a','#8f7712','#e3bc23','#fdf0bd','#a88c17','#f1d65a','#6f5c0e'];
 
@@ -1166,14 +1168,20 @@
     }
     if (!shown(c).length) h += '<div class="card"><div class="empty">尚無項目，請到「設定」填金額。</div></div>';
     if (shown(c).length) h += '<div class="bgrid">';
-    shown(c).forEach(b => {
+    const remainOf = b => b.amount - spentOf(c, b.id);
+    const ordered = shown(c).slice().sort((a, b) => {
+      const fa = remainOf(a) <= 0, fb = remainOf(b) <= 0;
+      if (fa !== fb) return fa ? 1 : -1;          // 額滿的往後
+      return remainOf(b) - remainOf(a);           // 剩越多越前面
+    });
+    ordered.forEach(b => {
       const spent = spentOf(c, b.id), remain = b.amount - spent;
       const ratio = b.amount > 0 ? Math.min(1, spent / b.amount) : (spent > 0 ? 1 : 0);
       const over = remain < 0;
       const daily = remain / dl;
       const list = sortExp(c.expenses.filter(e => e.budgetId === b.id));
       // 兩欄小卡：名稱 → 進度條 → 剩餘 → 每日可用（大字靠右）→ 底部提示；點開時整張卡片撐滿一列顯示明細
-      h += '<div class="card bcard'+(isPurple(b)?' pur':'')+'" data-card="'+b.id+'" style="--bc:'+colorOf(c, b)+'">'
+      h += '<div class="card bcard'+(isPurple(b)?' pur':'')+(remain<=0?' full':'')+'" data-card="'+b.id+'" style="--bc:'+colorOf(c, b)+'">'
         + '<div class="bname"><span class="bn">'+esc(b.name)+'</span>'+iconSVG(b.name)+'</div>'
         + '<div class="bar'+(over?' over':'')+'"><i style="width:'+(ratio*100).toFixed(1)+'%"></i></div>'
         + '<div class="bremain">剩 <b'+(remain<0?' class="neg"':'')+'>'+money(remain)+'</b> / '+money(b.amount)+'</div>'
@@ -1323,11 +1331,11 @@
     let h = '<div class="card"><div class="sumhead"><b>'+periodName(c)+'</b><span>'
       + (isCurrent() ? '距離下次發薪日（'+md(c.end)+'）還有 '+daysLeft(c)+' 天' : '已結束（'+range(c)+'）') + '</span></div>'
       + '<div class="sumtop">'
-      + '<div><div class="label">'+periodName(c)+'總花費</div><div class="big">'+money(ts)+'</div></div>'
+      + '<div><div class="label">預算剩餘</div><div class="big'+(left<0?' neg':'')+'">'+money(left)+'</div></div>'
       + '<div><div class="label">已儲蓄</div><div class="big purple">'+money(sumByWord(c,'儲蓄'))+'</div></div>'
       + '<div><div class="label">已投資</div><div class="big purple">'+money(sumByWord(c,'投資'))+'</div></div>'
       + '</div><div class="sumR sumbot">'
-      + '<div><span class="label">預算剩餘</span><b'+(left<0?' class="neg"':'')+'>'+money(left)+'</b></div>'
+      + '<div><span class="label">'+periodName(c)+'總花費</span><b>'+money(ts)+'</b></div>'
       + '<div><span class="label">總預期支出</span><b>'+money(tb)+'</b></div>'
       + '<div><span class="label">未分配預算</span><b'+(unalloc<0?' class="neg"':'')+'>'+money(unalloc)+'</b></div>'
       + '</div>';
